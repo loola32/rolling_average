@@ -1,0 +1,23 @@
+/*To solve this problem:
+
+Using window function with the ability to control the rolling average window
+
+1. The inner query of table A, sums the transactions and groups them by day (converting the timestamp to date).
+2. The outer query with the window functions creates a rolling average for a window of 3 days.
+3. Using the round function to display only two digits after the comma for the transactions for readability.
+*/
+
+
+select
+transaction_date,
+ROUND(avg(transaction_per_day) over (order by transaction_date rows between 2 preceding and current row)::numeric,2) as rolling_three_day_avg
+from
+(
+select
+cast(transaction_time as date) as transaction_date,
+sum(transaction_amount) as transaction_per_day
+from transactions
+group by 1
+order by transaction_date 
+  )A
+
